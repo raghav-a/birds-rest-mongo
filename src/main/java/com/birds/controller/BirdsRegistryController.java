@@ -57,7 +57,7 @@ public class BirdsRegistryController {
         return birdsRegistryDao.getAll()
             .stream()
             .filter(Bird::getVisibility)
-            .map(bird -> bird.getIdAsHex())
+            .map(Bird::getIdAsHex)
             .collect(Collectors.toList());
     }
 
