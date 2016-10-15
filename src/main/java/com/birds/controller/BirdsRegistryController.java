@@ -23,6 +23,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class BirdsRegistryController {
 
+    private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);;
+
     public BirdsRegistryController(BirdsRegistryDao birdsRegistryDao) {
         this.birdsRegistryDao = birdsRegistryDao;
     }
@@ -38,13 +40,15 @@ public class BirdsRegistryController {
         try {
             objectId = new ObjectId(id);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return NOT_FOUND;
         }
         final Bird bird = birdsRegistryDao.get(objectId);
         return bird == null ?
-            new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(bird.toJson(), HttpStatus.OK);
+            NOT_FOUND : new ResponseEntity<>(bird.toJson(), HttpStatus.OK);
 
     }
+
+
 
     @RequestMapping(value = "/birds", method = GET)
     public
@@ -83,9 +87,9 @@ public class BirdsRegistryController {
         try {
             objectId = new ObjectId(id);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return NOT_FOUND;
         }
-        return birdsRegistryDao.get(objectId) == null ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) : delete(objectId);
+        return birdsRegistryDao.get(objectId) == null ? NOT_FOUND : delete(objectId);
     }
 
     private ResponseEntity<String> delete(ObjectId id) {
