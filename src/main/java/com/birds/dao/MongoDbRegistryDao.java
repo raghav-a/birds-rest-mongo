@@ -2,36 +2,36 @@ package com.birds.dao;
 
 
 import com.birds.model.Bird;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 @Component("birds_dao_mongodb")
-public class MongoDbDao implements BirdsDao {
+public class MongoDbRegistryDao implements BirdsRegistryDao {
 
     @Autowired
     BirdsRepository birdsRepository;
 
 
     @Override
-    public Bird get(BigInteger id) {
+    public Bird get(ObjectId id) {
         return birdsRepository.findOne(id);
     }
 
     @Override
-    public Collection<Bird> values() {
+    public Collection<Bird> getAll() {
         return birdsRepository.findAll();
     }
 
     @Override
-    public void put(BigInteger id, Bird bird) {
+    public void save(Bird bird) {
         birdsRepository.insert(bird);
     }
 
     @Override
-    public void remove(BigInteger id) {
-         birdsRepository.delete(id);
+    public void remove(ObjectId id) {
+        birdsRepository.delete(id);
     }
 }
