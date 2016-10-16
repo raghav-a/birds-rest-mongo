@@ -1,11 +1,13 @@
 package com.birds.model;
 
+import com.birds.exceptions.InvalidBirdDataException;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.birds.model.BirdData.InvalidBirdDataException.INVALID_INPUT;
-import static com.birds.model.BirdData.InvalidBirdDataException.REQUIRED_DATA_MISSING;
+import static com.birds.exceptions.InvalidBirdDataException.INVALID_INPUT;
+import static com.birds.exceptions.InvalidBirdDataException.REQUIRED_DATA_MISSING;
 
 public class BirdData {
 
@@ -69,12 +71,4 @@ public class BirdData {
     }
 
 
-    public static class InvalidBirdDataException extends Exception {
-        public static String REQUIRED_DATA_MISSING= "REQUIRED_DATA_MISSING";
-        public static String INVALID_INPUT= "INVALID_INPUT";
-
-        public InvalidBirdDataException(String message) {
-            super(message);
-        }
-    }
 }

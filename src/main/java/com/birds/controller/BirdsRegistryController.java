@@ -3,6 +3,7 @@ package com.birds.controller;
 
 import com.birds.DateUtil;
 import com.birds.dao.BirdsRegistryDao;
+import com.birds.exceptions.ApplicationException;
 import com.birds.model.Bird;
 import com.birds.model.BirdData;
 import org.bson.types.ObjectId;
@@ -23,7 +24,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class BirdsRegistryController {
 
-    private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);;
+    private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 
     public BirdsRegistryController(BirdsRegistryDao birdsRegistryDao) {
         this.birdsRegistryDao = birdsRegistryDao;
@@ -36,18 +37,11 @@ public class BirdsRegistryController {
 
     @RequestMapping(value = "/birds/{id}", method = GET)
     public ResponseEntity<String> get(@PathVariable(value = "id") String id) {
-        ObjectId objectId = null;
-        try {
-            objectId = new ObjectId(id);
-        } catch (RuntimeException e) {
-            return NOT_FOUND;
-        }
-        final Bird bird = birdsRegistryDao.get(objectId);
+        final Bird bird = birdsRegistryDao.get(getValidObjectId(id));
         return bird == null ?
             NOT_FOUND : new ResponseEntity<>(bird.toJson(), HttpStatus.OK);
 
     }
-
 
 
     @RequestMapping(value = "/birds", method = GET)
@@ -65,13 +59,7 @@ public class BirdsRegistryController {
     public
     @ResponseBody
     ResponseEntity<String> addBird(@RequestBody BirdData birdData) {
-        try {
-            birdData.validate();
-        } catch (BirdData.InvalidBirdDataException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(null);
-        }
-
+        birdData.validate();
         final Bird bird = new Bird(birdData, DateUtil.currentDate());
         birdsRegistryDao.save(bird);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -83,12 +71,7 @@ public class BirdsRegistryController {
     public
     @ResponseBody
     ResponseEntity<String> deleteBird(@PathVariable(value = "id") String id) {
-        ObjectId objectId = null;
-        try {
-            objectId = new ObjectId(id);
-        } catch (RuntimeException e) {
-            return NOT_FOUND;
-        }
+        final ObjectId objectId = getValidObjectId(id);
         return birdsRegistryDao.get(objectId) == null ? NOT_FOUND : delete(objectId);
     }
 
@@ -96,6 +79,15 @@ public class BirdsRegistryController {
         birdsRegistryDao.remove(id);
         return ResponseEntity.status(HttpStatus.OK)
             .body(null);
+    }
+
+    public ObjectId getValidObjectId(String string) {
+        try {
+            return new ObjectId(string);
+        } catch (RuntimeException e) {
+            throw new ApplicationException(HttpStatus.NOT_FOUND);
+        }
+
     }
 
 }
