@@ -62,6 +62,9 @@ public class BirdData {
         continentsAsSet = new HashSet<>(continents);
         if (continentsAsSet.size() != continents.size())
             throw new InvalidBirdDataException(INVALID_INPUT);
+        if(continentsAsSet.stream().anyMatch(continent -> !DateUtil.continents.contains(continent))){
+            throw new InvalidBirdDataException(INVALID_INPUT);
+        }
         if (added == null) {
             added = DateUtil.currentDate();
         } else {
@@ -99,26 +102,5 @@ public class BirdData {
         return added;
     }
 
-    private Set<DateUtil.Continent> validateContinents(List<String> continents) {
-        Set<DateUtil.Continent> continentsAsSet = new HashSet<>();
-        for (String continent : continents) {
-            continentsAsSet.add(DateUtil.Continent.continentFor(continent));
-        }
-        if (continentsAsSet.size() != continents.size())
-            throw new InvalidBirdDataException(INVALID_INPUT);
-        return continentsAsSet;
-    }
 
-    private void validateDate(String added) {
-        SimpleDateFormat dt = new SimpleDateFormat("yyyy-mm-dd");
-        try {
-            final Date parse = dt.parse(added);
-            final String format = dt.format(parse);
-            if (!added.equals(format)) {
-                throw new InvalidBirdDataException(INVALID_INPUT);
-            }
-        } catch (ParseException e) {
-            throw new InvalidBirdDataException(INVALID_INPUT);
-        }
-    }
 }
