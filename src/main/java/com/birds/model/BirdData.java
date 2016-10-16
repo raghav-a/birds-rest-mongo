@@ -1,7 +1,11 @@
 package com.birds.model;
 
+import com.birds.DateUtil;
 import com.birds.exceptions.InvalidBirdDataException;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,17 +18,26 @@ public class BirdData {
     private String name;
     private String family;
     private List<String> continents;
-    private Boolean visibility ;
+    private Boolean visibility;
     private Set<String> continentsAsSet;
+    private String added;
 
     public BirdData() {
     }
 
-    public BirdData(String name, String family, Set<String> continents, Boolean visibility) {
-        this.name = name;
-        this.family = family;
-        this.continentsAsSet = continents;
-        this.visibility = visibility;
+    @Override
+    public String toString() {
+        return "BirdData{" +
+            "added='" + added + '\'' +
+            ", name='" + name + '\'' +
+            ", family='" + family + '\'' +
+            ", continents=" + continents +
+            ", visibility=" + visibility +
+            '}';
+    }
+
+    public void setAdded(String added) {
+        this.added = added;
     }
 
     public String getName() {
@@ -44,17 +57,31 @@ public class BirdData {
     }
 
     public void validate() throws InvalidBirdDataException {
-        if (family == null || name == null || continents.size() < 1 )
+        if (family == null || name == null || continents.size() < 1 || continents.size() > 7)
             throw new InvalidBirdDataException(REQUIRED_DATA_MISSING);
         continentsAsSet = new HashSet<>(continents);
         if (continentsAsSet.size() != continents.size())
             throw new InvalidBirdDataException(INVALID_INPUT);
+        if (added == null) {
+            added = DateUtil.currentDate();
+        } else {
+            try {
+                DateUtil.validate(added);
+            } catch (IllegalStateException e) {
+                throw new InvalidBirdDataException(INVALID_INPUT);
+            }
+        }
 
     }
 
-    public Set<String> getContinents() {
+    public List<String> getContinents() {
+        return continents;
+    }
+
+    public Set<String> getContinentsAsSet() {
         return continentsAsSet;
     }
+
 
     public void setContinents(List<String> continents) {
         this.continents = continents;
@@ -68,5 +95,30 @@ public class BirdData {
         this.visibility = visibility;
     }
 
+    public String added() {
+        return added;
+    }
 
+    private Set<DateUtil.Continent> validateContinents(List<String> continents) {
+        Set<DateUtil.Continent> continentsAsSet = new HashSet<>();
+        for (String continent : continents) {
+            continentsAsSet.add(DateUtil.Continent.continentFor(continent));
+        }
+        if (continentsAsSet.size() != continents.size())
+            throw new InvalidBirdDataException(INVALID_INPUT);
+        return continentsAsSet;
+    }
+
+    private void validateDate(String added) {
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-mm-dd");
+        try {
+            final Date parse = dt.parse(added);
+            final String format = dt.format(parse);
+            if (!added.equals(format)) {
+                throw new InvalidBirdDataException(INVALID_INPUT);
+            }
+        } catch (ParseException e) {
+            throw new InvalidBirdDataException(INVALID_INPUT);
+        }
+    }
 }

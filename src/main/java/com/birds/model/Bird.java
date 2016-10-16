@@ -1,11 +1,11 @@
 package com.birds.model;
 
+import com.birds.DateUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
-import java.util.Date;
 import java.util.Set;
 
 public class Bird {
@@ -17,15 +17,15 @@ public class Bird {
     private String name;
     private String family;
     private Set<String> continents;
-    private String addedOn;
+    private String added;
     private Boolean visibility;
 
-    public Bird(BirdData birdData, String addedOn) {
+    public Bird(BirdData birdData) {
         this.name = birdData.getName();
         this.family = birdData.getFamily();
-        this.continents = birdData.getContinents();
+        this.continents = birdData.getContinentsAsSet();
         this.visibility = birdData.getVisibility();
-        this.addedOn = addedOn;
+        this.added = birdData.added();
     }
 
     public Bird() {
@@ -40,7 +40,7 @@ public class Bird {
         private Boolean visibility;
         private Set<String> continents;
         private String family;
-        private String addedOn;
+        private String added;
 
         private BirdBuilder() {
         }
@@ -66,8 +66,8 @@ public class Bird {
             return this;
         }
 
-        public BirdBuilder addedOn(String addedOn) {
-            this.addedOn = addedOn;
+        public BirdBuilder added(String added) {
+            this.added = added;
             return this;
         }
 
@@ -77,13 +77,13 @@ public class Bird {
             bird.continents = this.continents;
             bird.name = this.name;
             bird.visibility = this.visibility;
-            bird.addedOn = this.addedOn;
+            bird.added = this.added;
             return bird;
         }
     }
 
-    public String getAddedOn() {
-        return addedOn;
+    public String getAdded() {
+        return added;
     }
 
     public Set<String> getContinents() {
@@ -122,7 +122,7 @@ public class Bird {
         int result = name.hashCode();
         result = 31 * result + family.hashCode();
         result = 31 * result + continents.hashCode();
-        result = 31 * result + (addedOn != null ? addedOn.hashCode() : 0);
+        result = 31 * result + (added != null ? added.hashCode() : 0);
         result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
         return result;
     }
@@ -137,7 +137,7 @@ public class Bird {
         if (!name.equals(bird.name)) return false;
         if (!family.equals(bird.family)) return false;
         if (!continents.equals(bird.continents)) return false;
-        if (addedOn != null ? !addedOn.equals(bird.addedOn) : bird.addedOn != null) return false;
+        if (added != null ? !added.equals(bird.added) : bird.added != null) return false;
         return !(visibility != null ? !visibility.equals(bird.visibility) : bird.visibility != null);
 
     }
@@ -145,7 +145,7 @@ public class Bird {
     @Override
     public String toString() {
         return "Bird{" +
-            "addedOn=" + addedOn +
+            "addedOn=" + added +
             ", id=" + id.toHexString() +
             ", name='" + name + '\'' +
             ", family='" + family + '\'' +

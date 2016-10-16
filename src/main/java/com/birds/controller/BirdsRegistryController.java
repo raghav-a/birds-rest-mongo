@@ -7,12 +7,15 @@ import com.birds.exceptions.ApplicationException;
 import com.birds.model.Bird;
 import com.birds.model.BirdData;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 public class BirdsRegistryController {
+
+    private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     @Autowired
@@ -58,7 +63,7 @@ public class BirdsRegistryController {
     @ResponseBody
     ResponseEntity<String> addBird(@RequestBody BirdData birdData) {
         birdData.validate();
-        final Bird bird = new Bird(birdData, DateUtil.currentDate());
+        final Bird bird = new Bird(birdData);
         birdsRegistryDao.save(bird);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(bird.toJson());

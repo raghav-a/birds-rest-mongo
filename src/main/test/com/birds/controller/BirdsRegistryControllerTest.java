@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.*;
 import java.io.IOException;
 import java.util.List;
 
+import static com.birds.DateUtil.Continent.asia;
+import static com.birds.DateUtil.Continent.north_america;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -129,7 +131,7 @@ public class BirdsRegistryControllerTest {
             .family("birdFamily")
             .continents(newHashSet("north america", "asia"))
             .visibility(false)
-            .addedOn(DateUtil.currentDate())
+            .added(DateUtil.currentDate())
             .build();
     }
 
@@ -139,7 +141,7 @@ public class BirdsRegistryControllerTest {
             .family("birdFamily")
             .continents(newHashSet("north america", "asia"))
             .visibility(true)
-            .addedOn(DateUtil.currentDate());
+            .added(DateUtil.currentDate());
 
     }
 
