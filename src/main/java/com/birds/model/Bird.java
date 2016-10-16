@@ -18,32 +18,7 @@ public class Bird {
     private String family;
     private Set<String> continents;
     private String addedOn;
-
-    public String getAddedOn() {
-        return addedOn;
-    }
-
-    public Set<String> getContinents() {
-        return continents;
-    }
-
-    public Boolean getVisibility() {
-        return visibility != null && visibility;
-    }
-
     private Boolean visibility;
-
-    @Override
-    public String toString() {
-        return "Bird{" +
-            "addedOn=" + addedOn +
-            ", id=" + id.toHexString() +
-            ", name='" + name + '\'' +
-            ", family='" + family + '\'' +
-            ", continents=" + continents +
-            ", visibility=" + visibility +
-            '}';
-    }
 
     public Bird(BirdData birdData, String addedOn) {
         this.name = birdData.getName();
@@ -54,56 +29,6 @@ public class Bird {
     }
 
     public Bird() {
-    }
-
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public String getIdAsHex() {
-        return id!=null ? id.toHexString() : "";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getFamily() {
-        return family;
-    }
-
-    public String toJson() {
-        final JsonObject jsonElement = (JsonObject) gson.toJsonTree(this);
-        jsonElement.addProperty("id", id.toHexString());
-        return gson.toJson(jsonElement);
-
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Bird bird = (Bird) o;
-
-        if (!name.equals(bird.name)) return false;
-        if (!family.equals(bird.family)) return false;
-        if (!continents.equals(bird.continents)) return false;
-        if (addedOn != null ? !addedOn.equals(bird.addedOn) : bird.addedOn != null) return false;
-        return !(visibility != null ? !visibility.equals(bird.visibility) : bird.visibility != null);
-
-    }
-
-
-    @Override
-    public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + family.hashCode();
-        result = 31 * result + continents.hashCode();
-        result = 31 * result + (addedOn != null ? addedOn.hashCode() : 0);
-        result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
-        return result;
     }
 
     public static BirdBuilder builder() {
@@ -155,5 +80,77 @@ public class Bird {
             bird.addedOn = this.addedOn;
             return bird;
         }
+    }
+
+    public String getAddedOn() {
+        return addedOn;
+    }
+
+    public Set<String> getContinents() {
+        return continents;
+    }
+
+    public Boolean getVisibility() {
+        return visibility != null && visibility;
+    }
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public String getIdAsHex() {
+        return id!=null ? id.toHexString() : "";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFamily() {
+        return family;
+    }
+
+    public String toJson() {
+        final JsonObject jsonElement = (JsonObject) gson.toJsonTree(this);
+        jsonElement.addProperty("id", id.toHexString());
+        return gson.toJson(jsonElement);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + family.hashCode();
+        result = 31 * result + continents.hashCode();
+        result = 31 * result + (addedOn != null ? addedOn.hashCode() : 0);
+        result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Bird bird = (Bird) o;
+
+        if (!name.equals(bird.name)) return false;
+        if (!family.equals(bird.family)) return false;
+        if (!continents.equals(bird.continents)) return false;
+        if (addedOn != null ? !addedOn.equals(bird.addedOn) : bird.addedOn != null) return false;
+        return !(visibility != null ? !visibility.equals(bird.visibility) : bird.visibility != null);
+
+    }
+
+    @Override
+    public String toString() {
+        return "Bird{" +
+            "addedOn=" + addedOn +
+            ", id=" + id.toHexString() +
+            ", name='" + name + '\'' +
+            ", family='" + family + '\'' +
+            ", continents=" + continents +
+            ", visibility=" + visibility +
+            '}';
     }
 }

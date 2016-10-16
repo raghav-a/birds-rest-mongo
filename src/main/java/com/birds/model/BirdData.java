@@ -17,15 +17,6 @@ public class BirdData {
     private Boolean visibility ;
     private Set<String> continentsAsSet;
 
-    public void setContinents(List<String> continents) {
-        this.continents = continents;
-    }
-
-    public void setVisibility(Boolean visibility) {
-        this.visibility = visibility;
-    }
-
-
     public BirdData() {
     }
 
@@ -36,20 +27,20 @@ public class BirdData {
         this.visibility = visibility;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setFamily(String family) {
-        this.family = family;
-    }
-
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFamily() {
         return family;
+    }
+
+    public void setFamily(String family) {
+        this.family = family;
     }
 
     public void validate() throws InvalidBirdDataException {
@@ -61,13 +52,20 @@ public class BirdData {
 
     }
 
-
     public Set<String> getContinents() {
         return continentsAsSet;
     }
 
+    public void setContinents(List<String> continents) {
+        this.continents = continents;
+    }
+
     public Boolean getVisibility() {
         return visibility;
+    }
+
+    public void setVisibility(Boolean visibility) {
+        this.visibility = visibility;
     }
 
 

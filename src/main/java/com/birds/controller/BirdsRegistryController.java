@@ -25,15 +25,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class BirdsRegistryController {
 
     private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-
-    public BirdsRegistryController(BirdsRegistryDao birdsRegistryDao) {
-        this.birdsRegistryDao = birdsRegistryDao;
-    }
-
     @Autowired
     @Qualifier("birds_dao_mongodb")
     private BirdsRegistryDao birdsRegistryDao;
 
+    public BirdsRegistryController(BirdsRegistryDao birdsRegistryDao) {
+        this.birdsRegistryDao = birdsRegistryDao;
+    }
 
     @RequestMapping(value = "/birds/{id}", method = GET)
     public ResponseEntity<String> get(@PathVariable(value = "id") String id) {
@@ -75,12 +73,6 @@ public class BirdsRegistryController {
         return birdsRegistryDao.get(objectId) == null ? NOT_FOUND : delete(objectId);
     }
 
-    private ResponseEntity<String> delete(ObjectId id) {
-        birdsRegistryDao.remove(id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(null);
-    }
-
     public ObjectId getValidObjectId(String string) {
         try {
             return new ObjectId(string);
@@ -88,6 +80,12 @@ public class BirdsRegistryController {
             throw new ApplicationException(HttpStatus.NOT_FOUND);
         }
 
+    }
+
+    private ResponseEntity<String> delete(ObjectId id) {
+        birdsRegistryDao.remove(id);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(null);
     }
 
 }
