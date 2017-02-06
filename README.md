@@ -5,9 +5,9 @@ National geographic wants an application for maintaining the records of differen
 
 After discussions in your team and considering various options you decide to use spring boot as a framework for this micro service and mongo db as the data source for this service.
 
-You decide to expose restful endpoints for the api’s you will need on this micro-servcie. 
+You decide to expose restful endpoints for the apis you will need on this micro-servcie. 
 
-The specs for these api’s can be found at https://gist.github.com/sebdah/265f4255cb302c80abd4
+The specs for these apis can be found at https://gist.github.com/sebdah/265f4255cb302c80abd4
 
 ------------------------------------------
 
