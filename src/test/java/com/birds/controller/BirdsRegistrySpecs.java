@@ -1,6 +1,5 @@
 package com.birds.controller;
 
-import com.birds.DateUtil;
 import com.birds.controller.data.BirdData;
 import com.birds.dao.BirdsRepository;
 import com.birds.model.Bird;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.birds.model.ApplicationDate.currentDate;
-import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -131,16 +129,15 @@ public class BirdsRegistrySpecs {
     }
 
     private BirdData invalidBirdData() {
-        return new BirdData(null, "birdFamily", Lists.newArrayList("north america", "asia"), currentDate(), false);
+        return new BirdData(null, "birdFamily", Lists.newArrayList("asia", "north america"), currentDate(), false);
     }
 
-
     private BirdData invisibleValidBirdData() {
-        return new BirdData("birdName", "birdFamily", Lists.newArrayList("north america", "asia"), currentDate(), false);
+        return new BirdData("birdName", "birdFamily", Lists.newArrayList("asia", "north america"), currentDate(), false);
     }
 
     private BirdData validBirdData() {
-        return new BirdData("birdName", "birdFamily", Lists.newArrayList("north america", "asia"), currentDate(), true);
+        return new BirdData("birdName", "birdFamily", Lists.newArrayList("north america","asia"), currentDate(), true);
     }
 
 

@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 import java.math.BigInteger;
 import java.util.Collection;
 
-public interface BirdsRegistryDao {
+public interface BirdsDao {
     Bird get(ObjectId id);
 
     Collection<Bird> getAll();

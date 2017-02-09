@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HashMapRegistryDao implements BirdsRegistryDao {
+public class HashMapBirdsDao implements BirdsDao {
 
     Map<ObjectId, Bird> birdsMap = new HashMap<>();
 

@@ -2,7 +2,7 @@ package com.birds.controller;
 
 
 import com.birds.controller.data.BirdData;
-import com.birds.dao.BirdsRegistryDao;
+import com.birds.dao.BirdsDao;
 import com.birds.exceptions.ApplicationException;
 import com.birds.model.Bird;
 import org.bson.types.ObjectId;
@@ -28,15 +28,15 @@ public class BirdsRegistryController {
     private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     @Autowired
     @Qualifier("birds_dao_mongodb")
-    private BirdsRegistryDao birdsRegistryDao;
+    private BirdsDao birdsDao;
 
-    public BirdsRegistryController(BirdsRegistryDao birdsRegistryDao) {
-        this.birdsRegistryDao = birdsRegistryDao;
+    public BirdsRegistryController(BirdsDao birdsDao) {
+        this.birdsDao = birdsDao;
     }
 
     @RequestMapping(value = "/birds/{id}", method = GET)
     public ResponseEntity<String> get(@PathVariable(value = "id") String id) {
-        final Bird bird = birdsRegistryDao.get(getValidObjectId(id));
+        final Bird bird = birdsDao.get(getValidObjectId(id));
         return bird == null ?
             NOT_FOUND :
             new ResponseEntity<>(bird.toJson(jsonBuilderFactory()), HttpStatus.OK);
@@ -48,7 +48,7 @@ public class BirdsRegistryController {
     public
     @ResponseBody
     Collection<String> getAll() {
-        return birdsRegistryDao.getAll()
+        return birdsDao.getAll()
             .stream()
             .filter(Bird::isVisibile)
             .map(Bird::idAsHex)
@@ -60,7 +60,7 @@ public class BirdsRegistryController {
     @ResponseBody
     ResponseEntity<String> addBird(@RequestBody BirdData birdData) {
         final Bird bird = new Bird(birdData);
-        birdsRegistryDao.save(bird);
+        birdsDao.save(bird);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(bird.toJson(jsonBuilderFactory()));
 
@@ -71,7 +71,7 @@ public class BirdsRegistryController {
     @ResponseBody
     ResponseEntity<String> deleteBird(@PathVariable(value = "id") String id) {
         final ObjectId objectId = getValidObjectId(id);
-        return birdsRegistryDao.get(objectId) == null ? NOT_FOUND : delete(objectId);
+        return birdsDao.get(objectId) == null ? NOT_FOUND : delete(objectId);
     }
 
     public ObjectId getValidObjectId(String string) {
@@ -84,7 +84,7 @@ public class BirdsRegistryController {
     }
 
     private ResponseEntity<String> delete(ObjectId id) {
-        birdsRegistryDao.remove(id);
+        birdsDao.remove(id);
         return ResponseEntity.status(HttpStatus.OK)
             .body(null);
     }

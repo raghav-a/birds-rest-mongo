@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component("birds_dao_mongodb")
-public class MongoDbRegistryDao implements BirdsRegistryDao {
+public class MongoDbBirdsDao implements BirdsDao {
 
     @Autowired
     BirdsRepository birdsRepository;
@@ -34,4 +34,5 @@ public class MongoDbRegistryDao implements BirdsRegistryDao {
     public void remove(ObjectId id) {
         birdsRepository.delete(id);
     }
+
 }

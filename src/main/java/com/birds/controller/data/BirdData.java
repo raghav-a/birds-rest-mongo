@@ -94,7 +94,7 @@ public class BirdData {
 
         if (name != null ? !name.equals(birdData.name) : birdData.name != null) return false;
         if (family != null ? !family.equals(birdData.family) : birdData.family != null) return false;
-        if (continents != null ? !continents.equals(birdData.continents) : birdData.continents != null) return false;
+        if (continents != null ? birdData.continents!=null && !continents.containsAll(birdData.continents) : birdData.continents != null) return false;
         if (added != null ? !added.equals(birdData.added) : birdData.added != null) return false;
         if (visibility != null ? !visibility.equals(birdData.visibility) : birdData.visibility != null) return false;
         return true;
