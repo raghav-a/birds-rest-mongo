@@ -23,7 +23,7 @@ public class HashMapRegistryDao implements BirdsRegistryDao {
 
     @Override
     public void save(Bird bird) {
-        birdsMap.put(bird.getId(),bird);
+        birdsMap.put(bird.id(),bird);
     }
 
     @Override

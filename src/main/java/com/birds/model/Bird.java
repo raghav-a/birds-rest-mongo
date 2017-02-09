@@ -1,131 +1,69 @@
 package com.birds.model;
 
-import com.birds.DateUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.birds.controller.data.BirdData;
+import com.birds.exceptions.ApplicationException;
+import com.birds.helpers.JsonBuilder;
+import com.google.common.collect.Lists;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.http.HttpStatus;
 
 import java.util.Set;
 
 public class Bird {
 
-    private static Gson gson = new Gson();
 
     @Id
     private ObjectId id;
     private String name;
     private String family;
-    private Set<String> continents;
-    private String added;
+    private Set<Continent> continents;
+    private ApplicationDate added;
     private Boolean visibility;
 
     public Bird(BirdData birdData) {
-        this.name = birdData.getName();
+        this.name = validateName(birdData.getName());
         this.family = birdData.getFamily();
-        this.continents = birdData.getContinentsAsSet();
+        this.continents = Continent.convert(birdData.getContinents());
         this.visibility = birdData.getVisibility();
-        this.added = birdData.added();
+        this.added = new ApplicationDate(birdData.added());
+    }
+
+    private String validateName(String name) {
+        if(name==null)
+            throw  new ApplicationException(HttpStatus.BAD_REQUEST);
+        return name;
     }
 
     public Bird() {
     }
 
-    public static BirdBuilder builder() {
-        return new BirdBuilder();
-    }
 
-    public static final class BirdBuilder {
-        private String name;
-        private Boolean visibility;
-        private Set<String> continents;
-        private String family;
-        private String added;
-
-        private BirdBuilder() {
-        }
-
-
-        public BirdBuilder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public BirdBuilder visibility(Boolean visibility) {
-            this.visibility = visibility;
-            return this;
-        }
-
-        public BirdBuilder continents(Set<String> continents) {
-            this.continents = continents;
-            return this;
-        }
-
-        public BirdBuilder family(String family) {
-            this.family = family;
-            return this;
-        }
-
-        public BirdBuilder added(String added) {
-            this.added = added;
-            return this;
-        }
-
-        public Bird build() {
-            Bird bird = new Bird();
-            bird.family = this.family;
-            bird.continents = this.continents;
-            bird.name = this.name;
-            bird.visibility = this.visibility;
-            bird.added = this.added;
-            return bird;
-        }
-    }
-
-    public String getAdded() {
-        return added;
-    }
-
-    public Set<String> getContinents() {
-        return continents;
-    }
-
-    public Boolean getVisibility() {
+    public Boolean isVisibile() {
         return visibility != null && visibility;
     }
 
-    public ObjectId getId() {
+    public ObjectId id() {
         return id;
     }
 
-    public String getIdAsHex() {
-        return id!=null ? id.toHexString() : "";
+    public String idAsHex() {
+        return id != null ? id.toHexString() : "";
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public String getFamily() {
-        return family;
-    }
-
-    public String toJson() {
-        final JsonObject jsonElement = (JsonObject) gson.toJsonTree(this);
-        jsonElement.addProperty("id", id.toHexString());
-        return gson.toJson(jsonElement);
+    public String toJson(JsonBuilder.JsonBuilderFactory jsonBuilderFactory) {
+        final JsonBuilder jsonBuilder = jsonBuilderFactory.newBuilder();
+        jsonBuilder.addProperty("id", id.toHexString());
+        jsonBuilder.addProperty("name", name);
+        jsonBuilder.addProperty("family", family);
+        jsonBuilder.addProperty("continents", Continent.convert(continents));
+        jsonBuilder.addProperty("added", added.toString());
+        jsonBuilder.addProperty("visibility", visibility);
+        return jsonBuilder.build();
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + family.hashCode();
-        result = 31 * result + continents.hashCode();
-        result = 31 * result + (added != null ? added.hashCode() : 0);
-        result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
-        return result;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -153,4 +91,5 @@ public class Bird {
             ", visibility=" + visibility +
             '}';
     }
+
 }

@@ -1,24 +1,21 @@
 package com.birds.controller;
 
 
-import com.birds.DateUtil;
+import com.birds.controller.data.BirdData;
 import com.birds.dao.BirdsRegistryDao;
 import com.birds.exceptions.ApplicationException;
 import com.birds.model.Bird;
-import com.birds.model.BirdData;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.birds.helpers.JsonBuilder.JsonBuilderFactory.jsonBuilderFactory;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -27,7 +24,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class BirdsRegistryController {
 
-    private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final ResponseEntity<String> NOT_FOUND = ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     @Autowired
@@ -42,7 +38,8 @@ public class BirdsRegistryController {
     public ResponseEntity<String> get(@PathVariable(value = "id") String id) {
         final Bird bird = birdsRegistryDao.get(getValidObjectId(id));
         return bird == null ?
-            NOT_FOUND : new ResponseEntity<>(bird.toJson(), HttpStatus.OK);
+            NOT_FOUND :
+            new ResponseEntity<>(bird.toJson(jsonBuilderFactory()), HttpStatus.OK);
 
     }
 
@@ -53,8 +50,8 @@ public class BirdsRegistryController {
     Collection<String> getAll() {
         return birdsRegistryDao.getAll()
             .stream()
-            .filter(Bird::getVisibility)
-            .map(Bird::getIdAsHex)
+            .filter(Bird::isVisibile)
+            .map(Bird::idAsHex)
             .collect(Collectors.toList());
     }
 
@@ -62,11 +59,10 @@ public class BirdsRegistryController {
     public
     @ResponseBody
     ResponseEntity<String> addBird(@RequestBody BirdData birdData) {
-        birdData.validate();
         final Bird bird = new Bird(birdData);
         birdsRegistryDao.save(bird);
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(bird.toJson());
+            .body(bird.toJson(jsonBuilderFactory()));
 
     }
 

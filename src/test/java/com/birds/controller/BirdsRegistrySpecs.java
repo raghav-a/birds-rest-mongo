@@ -1,8 +1,10 @@
 package com.birds.controller;
 
 import com.birds.DateUtil;
+import com.birds.controller.data.BirdData;
 import com.birds.dao.BirdsRepository;
 import com.birds.model.Bird;
+import com.google.common.collect.Lists;
 import org.bson.types.ObjectId;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import org.springframework.test.context.junit4.*;
 import java.io.IOException;
 import java.util.List;
 
+import static com.birds.model.ApplicationDate.currentDate;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -30,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
-public class BirdsRegistryControllerTest {
+public class BirdsRegistrySpecs {
 
     @Autowired
     TestRestTemplate restTemplate;
@@ -49,7 +52,7 @@ public class BirdsRegistryControllerTest {
     }
 
     @Test
-    public void badRequestOnPostWithInvalidBirdData() {
+    public void failOnPostWithInvalidBirdData() {
         final ResponseEntity response = restTemplate.postForEntity("/birds", invalidBirdData(), ResponseEntity.class);
         assertThat(response.getStatusCode(), Matchers.equalTo(HttpStatus.BAD_REQUEST));
 
@@ -57,23 +60,20 @@ public class BirdsRegistryControllerTest {
 
     @Test
     public void saveBirdOnPostWithCorrectBirdData() {
-        final Bird input = validBirdData().build();
-        final Bird bird = restTemplate.postForObject("/birds", input, Bird.class);
+        final BirdData input = validBirdData();
+        final BirdData bird = restTemplate.postForObject("/birds", input, BirdData.class);
         assertThat(bird, Matchers.notNullValue());
         assertThat(bird.getId(), Matchers.notNullValue());
-        assertThat(fetchFromDb(bird.getId()), Matchers.equalTo(input));
-    }
-
-    private Bird fetchFromDb(ObjectId id) {
-        return birdsRegistryDao.findOne(id);
+        assertThat(fetchFromDb(bird.getId()), Matchers.equalTo(new Bird(input)));
     }
 
     @Test
     public void getBirdById() {
-        final Bird validBird = validBirdData().visibility(true).build();
-        birdsRegistryDao.save(validBird);
-        final Bird response = restTemplate.getForObject("/birds/{id}", Bird.class, validBird.getIdAsHex());
-        assertThat(response, Matchers.equalTo(validBird));
+        final BirdData validBirdData = validBirdData();
+        final Bird bird = new Bird(validBirdData);
+        birdsRegistryDao.save(bird);
+        final BirdData response = restTemplate.getForObject("/birds/{id}", BirdData.class, bird.idAsHex());
+        assertThat(response, Matchers.equalTo(validBirdData));
     }
 
     @Test
@@ -84,35 +84,43 @@ public class BirdsRegistryControllerTest {
 
     @Test
     public void getAllVisibleBirds() {
-        final Bird visibleBirdOne = validBirdData().visibility(true).build();
-        final Bird visibleBirdTwo = validBirdData().visibility(true).build();
-        final Bird visibleBirdThree = validBirdData().visibility(true).build();
+        final Bird visibleBirdOne = new Bird(validBirdData());
+        final Bird visibleBirdTwo = new Bird(validBirdData());
+        final Bird visibleBirdThree = new Bird(validBirdData());
 
         saveBirds(visibleBirdOne, visibleBirdTwo, visibleBirdThree);
 
-        saveBirds(validBirdData().visibility(false).build());
-        saveBirds(validBirdData().visibility(false).build());
+        saveBirds(new Bird(invisibleValidBirdData()));
+        saveBirds(new Bird(invisibleValidBirdData()));
 
         final List birds = restTemplate.getForObject("/birds", List.class);
 
         assertThat(birds.size(), Matchers.equalTo(3));
-        assertTrue(birds.contains(visibleBirdOne.getIdAsHex()));
-        assertTrue(birds.contains(visibleBirdTwo.getIdAsHex()));
-        assertTrue(birds.contains(visibleBirdThree.getIdAsHex()));
+        assertTrue(birds.contains(visibleBirdOne.idAsHex()));
+        assertTrue(birds.contains(visibleBirdTwo.idAsHex()));
+        assertTrue(birds.contains(visibleBirdThree.idAsHex()));
     }
 
     @Test
     public void shouldDeleteBirdByValidId() {
-        final Bird validBird = validBirdData().visibility(true).build();
+        final Bird validBird = new Bird(validBirdData());
         saveBirds(validBird);
-        restTemplate.delete("/birds/{id}", validBird.getIdAsHex());
-        assertThat(fetchFromDb(validBird.getId()), Matchers.nullValue());
+        restTemplate.delete("/birds/{id}", validBird.idAsHex());
+        assertThat(fetchFromDb(validBird.id()), Matchers.nullValue());
     }
 
     @Test
     public void notFoundOnDeleteForInvalidId() throws IOException {
         ClientHttpResponse clientHttpResponse = restTemplate.execute("/birds/{id}", HttpMethod.DELETE, null, response -> response, "randomId");
         assertThat(clientHttpResponse.getStatusCode(), Matchers.equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    private Bird fetchFromDb(String id) {
+        return birdsRegistryDao.findOne(new ObjectId(id));
+    }
+
+    private Bird fetchFromDb(ObjectId id) {
+        return birdsRegistryDao.findOne(id);
     }
 
     private void saveBirds(Bird... birds) {
@@ -122,25 +130,17 @@ public class BirdsRegistryControllerTest {
 
     }
 
-
-    private Bird invalidBirdData() {
-        return Bird.builder()
-            .name(null)
-            .family("birdFamily")
-            .continents(newHashSet("north america", "asia"))
-            .visibility(false)
-            .added(DateUtil.currentDate())
-            .build();
+    private BirdData invalidBirdData() {
+        return new BirdData(null, "birdFamily", Lists.newArrayList("north america", "asia"), currentDate(), false);
     }
 
-    private Bird.BirdBuilder validBirdData() {
-        return Bird.builder()
-            .name("birdName")
-            .family("birdFamily")
-            .continents(newHashSet("north america", "asia"))
-            .visibility(true)
-            .added(DateUtil.currentDate());
 
+    private BirdData invisibleValidBirdData() {
+        return new BirdData("birdName", "birdFamily", Lists.newArrayList("north america", "asia"), currentDate(), false);
+    }
+
+    private BirdData validBirdData() {
+        return new BirdData("birdName", "birdFamily", Lists.newArrayList("north america", "asia"), currentDate(), true);
     }
 
 
