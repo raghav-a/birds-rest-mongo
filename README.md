@@ -1,4 +1,18 @@
-# birds registry (https://gist.github.com/sebdah/265f4255cb302c80abd4)
+Problem Statement
+-----------------------------------
+
+National geographic wants an application for maintaining the records of different species and capture various details about those species in the system. They read the success stories of various large scale products and came across the term “micro-service” at numerous places and they had this epiphany that micro-services is the way. They have come to you and are adamant about having the micro-servcies architecture. To start with they want you to write a micro-service which handles the registry for different species of birds. 
+
+After discussions in your team and considering various options you decide to use spring boot as a framework for this micro service and mongo db as the data source for this service.
+
+You decide to expose restful endpoints for the apis you will need on this micro-servcie. 
+
+The specs for these apis can be found at https://gist.github.com/sebdah/265f4255cb302c80abd4
+
+------------------------------------------
+
+
+
 
 Required tools/software
 
