@@ -11,11 +11,11 @@ public class JsonBuilder {
     private final JsonObject jsonObject;
     private static final Gson gson = new Gson();
 
-    public JsonBuilder() {
+    private JsonBuilder() {
         jsonObject = new JsonObject();
     }
 
-    public JsonBuilder(Object o) {
+    private JsonBuilder(Object o) {
         jsonObject = gson.toJsonTree(o).getAsJsonObject();
     }
 
@@ -28,9 +28,7 @@ public class JsonBuilder {
     }
 
     public String build() {
-        final String s = gson.toJson(jsonObject);
-        System.out.println("value is" + s);
-        return s;
+        return gson.toJson(jsonObject);
     }
 
     public static class JsonBuilderFactory {
